@@ -1,8 +1,7 @@
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
         Expression expression = new Expression();
@@ -13,8 +12,7 @@ public class Main {
         } else {
             result = (Calculation.opChoice(expression.operator, expression.a, expression.b));
             if (result < 1) {
-                System.out.println("Throws an exception, результат операций с римскими числами может быть только положительный!");
-                System.out.println(Expression.toRoman(result));
+                throw new Exception("Throws an exception, результат операций с римскими числами может быть только положительный!");
             } else
             System.out.println(Expression.toRoman(result));
         }
@@ -40,14 +38,14 @@ class Calculation {
         return a * b;
     }
 
-    public static int division(int a, int b) {
+    public static int division(int a, int b) throws Exception {
         if (b == 0) {
-            System.out.println("Divide by zero!");
+            throw new Exception("throws Exception //Divide by zero!");
         }
         return a / b;
-
     }
-    public static int opChoice(String operator, int operand1, int operand2) {
+
+    public static int opChoice(String operator, int operand1, int operand2) throws Exception {
         switch (operator){
             case "+":
                 return Calculation.addition(operand1, operand2);
@@ -58,16 +56,16 @@ class Calculation {
             case "/":
                 return Calculation.division(operand1, operand2);
             default:
-                break;
+                return 0;
         }
-        return 0;
     }
 }
 
+
 class Expression {
     public static Scanner scanner = new Scanner(System.in);
-    public static int  []A = { 1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000};
-    public static String []R = {"I","IV","V","IX","X","XL","L","XC","C","CD","D","CM","M"};
+    public static int  []A = { 1, 4, 5, 9, 10, 40, 50, 90, 100};
+    public static String []R = {"I","IV","V","IX","X","XL","L","XC","C"};
     int a;
     int b;
     String operand1;
@@ -75,28 +73,35 @@ class Expression {
     String operator;
     boolean roman = false;
 
-
-    public void parsing(String expression) {
+    public void parsing(String expression) throws Exception {
         String[] scannedExpression = expression.split(" ");
-        operand1 = scannedExpression[0];
-        operand2 = scannedExpression[2];
-        operator = scannedExpression[1];
+        try {
+            operand1 = scannedExpression[0];
+
+            operand2 = scannedExpression[2];
+            operator = scannedExpression[1];
+        } catch (Exception ArrayIndexOutOfBoundsException) {
+            throw new Exception("throws Exception //т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
+        }
         if (scannedExpression.length != 3 || (!operator.equals("+") && !operator.equals("-") &&
                 !operator.equals("*") && !operator.equals("/") )) {
-            System.out.println("throws Exception //т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
+            throw new Exception("throws Exception //т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
         } else if (!isRoman(scannedExpression[0]) && !isRoman(scannedExpression[2])){
-                a = Integer.parseInt(operand1);
-                b = Integer.parseInt(operand2);
+                try {
+                    a = Integer.parseInt(operand1);
+                    b = Integer.parseInt(operand2);
+                } catch (Exception NumberFormatException) {
+                    throw new Exception("throws Exception //т.к. строка не является математической операцией");
+                }
         } else if (isRoman(operand1) && isRoman(operand2)) {
                 a = toArabic(operand1);
                 b = toArabic(operand2);
                 roman = true;
         } else {
-            System.out.println("throws Exception // т.к. используются одновременно разные системы счисления");
+            throw new Exception("throws Exception // т.к. используются одновременно разные системы счисления");
 
         }
     }
-
 
     public static boolean isRoman(String operand) {
         int index = 1;
@@ -121,7 +126,7 @@ class Expression {
 
 
     public static String toRoman(int num) {
-        int i = 12;
+        int i = 8;
         String result = "";
         while (num > 0) {
             while (A[i] > num){
