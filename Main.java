@@ -2,32 +2,32 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        String[] expression = scanner.nextLine().split(" ");
-        if (numCheck(expression[0]) != 0 && (numCheck(expression[2]) != 0) {
 
-        }
-        numCheck(expression[2]);
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        Expression expression = new Expression();
+        expression.parsing(line);
         int result;
-        switch (expression[1]){
-            case "+":
-                result = addition(Integer.parseInt(expression[0]), Integer.parseInt(expression[2]));
-                System.out.println(result);
-                break;
-            case "-":
-                result = subtraction(Integer.parseInt(expression[0]), Integer.parseInt(expression[2]));
-                System.out.println(result);
-                break;
-            case "*":
-                result = multiplication(Integer.parseInt(expression[0]), Integer.parseInt(expression[2]));
-                System.out.println(result);
-                break;
-            case "/":
-                result = division(Integer.parseInt(expression[0]), Integer.parseInt(expression[2]));
-                System.out.println(result);
-                break;
+        if (!expression.roman) {
+            System.out.println(Calculation.opChoice(expression.operator, expression.a, expression.b));
+        } else {
+            result = (Calculation.opChoice(expression.operator, expression.a, expression.b));
+            if (result < 1) {
+                System.out.println("Throws an exception, результат операций с римскими числами может быть только положительный!");
+                System.out.println(Expression.toRoman(result));
+            } else
+            System.out.println(Expression.toRoman(result));
         }
     }
+
+    public enum Roman {
+        I, II, III, IV, V, VI, VII, VIII, IX, X
+    }
+}
+
+
+class Calculation {
+
     public static int addition(int a, int b) {
         return a + b;
     }
@@ -47,44 +47,91 @@ public class Main {
         return a / b;
 
     }
-
-    public static enum Roman {
-        I, II, III, IV, V, VI, VII, VIII, IX, X
+    public static int opChoice(String operator, int operand1, int operand2) {
+        switch (operator){
+            case "+":
+                return Calculation.addition(operand1, operand2);
+            case "-":
+                return Calculation.subtraction(operand1, operand2);
+            case "*":
+                return Calculation.multiplication(operand1, operand2);
+            case "/":
+                return Calculation.division(operand1, operand2);
+            default:
+                break;
+        }
+        return 0;
     }
 }
-class Parser {
-    public static Scanner scanner = new Scanner(System.in);
-     int a;
-     int b;
 
-    public static void parsing(String expression) {
-        String[] scannedExpression = scanner.nextLine().split(" ");
-        if (scannedExpression.length != 3 || !scannedExpression[1].equals("+") && !scannedExpression[1].equals("-") &&
-                !scannedExpression[1].equals("*") && !scannedExpression[1].equals("/") ) {
+class Expression {
+    public static Scanner scanner = new Scanner(System.in);
+    public static int  []A = { 1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000};
+    public static String []R = {"I","IV","V","IX","X","XL","L","XC","C","CD","D","CM","M"};
+    int a;
+    int b;
+    String operand1;
+    String operand2;
+    String operator;
+    boolean roman = false;
+
+
+    public void parsing(String expression) {
+        String[] scannedExpression = expression.split(" ");
+        operand1 = scannedExpression[0];
+        operand2 = scannedExpression[2];
+        operator = scannedExpression[1];
+        if (scannedExpression.length != 3 || (!operator.equals("+") && !operator.equals("-") &&
+                !operator.equals("*") && !operator.equals("/") )) {
             System.out.println("throws Exception //т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
-        } else if ((numCheck(scannedExpression[0]) > 0) && numCheck(scannedExpression[2]) > 0){
-            numCheck(scannedExpression[0]);
+        } else if (!isRoman(scannedExpression[0]) && !isRoman(scannedExpression[2])){
+                a = Integer.parseInt(operand1);
+                b = Integer.parseInt(operand2);
+        } else if (isRoman(operand1) && isRoman(operand2)) {
+                a = toArabic(operand1);
+                b = toArabic(operand2);
+                roman = true;
+        } else {
+            System.out.println("throws Exception // т.к. используются одновременно разные системы счисления");
+
         }
     }
-    public static int numCheck(String a) {
-        try {
-            Integer.parseInt(a);
-        } catch (Exception NumberFormatException) {
-            if (romanToArabic(a) != 0) {
-                return romanToArabic(a);
-            }
-            System.out.println("Throws exception т.к. не является математической операцией.");
-        } return 0;
-    }
 
-    public static int romanToArabic(String a) {
+
+    public static boolean isRoman(String operand) {
         int index = 1;
         for (Main.Roman value : Main.Roman.values()) {
-            if (value.name().equals(a)) {
-                return index;
+            if (value.name().equals(operand)) {
+                return true;
             }
             index++;
-        }return 0;
+        } return false;
+    }
+
+    public static int toArabic(String operand) {
+        int index = 0;
+        int result = 0;
+        for (Main.Roman value : Main.Roman.values()) {
+            if (value.name().equals(operand)) {
+                result = index + 1;
+            }
+            index++;
+        } return result;
+    }
+
+
+    public static String toRoman(int num) {
+        int i = 12;
+        String result = "";
+        while (num > 0) {
+            while (A[i] > num){
+                i--;
+            }
+            result += R[i];
+            num -= A[i];
+
+        }
+        return result;
     }
 }
 
