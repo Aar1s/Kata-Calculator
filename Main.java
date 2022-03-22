@@ -40,7 +40,7 @@ class Calculation {
 
     public static int division(int a, int b) throws Exception {
         if (b == 0) {
-            throw new Exception("throws Exception //Divide by zero!");
+            throw new Exception("throws Exception // Divide by zero!");
         }
         return a / b;
     }
@@ -56,7 +56,8 @@ class Calculation {
             case "/":
                 return Calculation.division(operand1, operand2);
             default:
-                return 0;
+                String details = String.format("throws Exception //т.к. %s не является оператором.", operator);
+                throw new Exception(details);
         }
     }
 }
@@ -71,27 +72,29 @@ class Expression {
     String operand1;
     String operand2;
     String operator;
-    boolean roman = false;
+    static boolean roman = false;
 
     public void parsing(String expression) throws Exception {
         String[] scannedExpression = expression.split(" ");
+        if (scannedExpression.length != 3) {
+            throw new Exception("throws Exception // т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
+        }
         try {
             operand1 = scannedExpression[0];
-
             operand2 = scannedExpression[2];
             operator = scannedExpression[1];
         } catch (Exception ArrayIndexOutOfBoundsException) {
-            throw new Exception("throws Exception //т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
+            throw new Exception("throws Exception // т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
         }
-        if (scannedExpression.length != 3 || (!operator.equals("+") && !operator.equals("-") &&
-                !operator.equals("*") && !operator.equals("/") )) {
-            throw new Exception("throws Exception //т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
-        } else if (!isRoman(scannedExpression[0]) && !isRoman(scannedExpression[2])){
+         if (!isRoman(scannedExpression[0]) && !isRoman(scannedExpression[2])){
                 try {
                     a = Integer.parseInt(operand1);
                     b = Integer.parseInt(operand2);
                 } catch (Exception NumberFormatException) {
-                    throw new Exception("throws Exception //т.к. строка не является математической операцией");
+                    throw new Exception("throws Exception // т.к. строка не является математической операцией");
+                }
+                if (a > 10 || b > 10 || a == 0 || b == 0) {
+                    throw new Exception("throws Exception // т.к. не поддерживаются операции с числами больше 10");
                 }
         } else if (isRoman(operand1) && isRoman(operand2)) {
                 a = toArabic(operand1);
@@ -99,11 +102,14 @@ class Expression {
                 roman = true;
         } else {
             throw new Exception("throws Exception // т.к. используются одновременно разные системы счисления");
-
         }
     }
 
-    public static boolean isRoman(String operand) {
+
+    public static boolean isRoman(String operand) throws Exception { // проверка, является ли число римским от 1 до 10
+        if (operand.charAt(0) == 'X' && operand.length() > 1) {
+            throw new Exception("throws Exception // т.к. поддерживаются только числа меньше 10");
+        }
         int index = 1;
         for (Main.Roman value : Main.Roman.values()) {
             if (value.name().equals(operand)) {
@@ -113,7 +119,8 @@ class Expression {
         } return false;
     }
 
-    public static int toArabic(String operand) {
+
+    public static int toArabic(String operand) { // перевод из римских чисел в арабские
         int index = 0;
         int result = 0;
         for (Main.Roman value : Main.Roman.values()) {
@@ -125,18 +132,18 @@ class Expression {
     }
 
 
-    public static String toRoman(int num) {
+    public static String toRoman(int num) { // перевод в римские числа из арабских
         int i = 8;
-        String result = "";
+        StringBuilder result = new StringBuilder();
         while (num > 0) {
             while (A[i] > num){
                 i--;
             }
-            result += R[i];
+            result.append(R[i]);
             num -= A[i];
 
         }
-        return result;
+        return result.toString();
     }
 }
 
